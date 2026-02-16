@@ -9,15 +9,54 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "antigravity-model-usage.helloWorld",
-        "title": "Hello World"
+        "command": "antigravity-model-usage.showDashboard",
+        "title": "Antigravity: Show Usage Dashboard"
+      },
+      {
+        "command": "antigravity-model-usage.resetUsageData",
+        "title": "Antigravity: Reset Usage Data"
+      },
+      {
+        "command": "antigravity-model-usage.toggleTracking",
+        "title": "Antigravity: Toggle Usage Tracking"
+      },
+      {
+        "command": "antigravity-model-usage.logManualUsage",
+        "title": "Antigravity: Log Manual Usage"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Antigravity Model Usage",
+      "properties": {
+        "antigravity.estimatedDailyLimit": {
+          "type": "number",
+          "default": 1500,
+          "description": "Estimated daily request limit for your Antigravity IDE plan."
+        },
+        "antigravity.estimatedPerMinuteLimit": {
+          "type": "number",
+          "default": 30,
+          "description": "Estimated per-minute request limit for your Antigravity IDE plan."
+        },
+        "antigravity.warningThresholdPercent": {
+          "type": "number",
+          "default": 70,
+          "description": "Percentage of daily limit at which to show a warning."
+        },
+        "antigravity.criticalThresholdPercent": {
+          "type": "number",
+          "default": 90,
+          "description": "Percentage of daily limit at which to show a critical alert."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

@@ -6,8 +6,8 @@
 |-----------|--------|-------|
 | 1. Foundation — Types & Storage | COMPLETE | Types, StorageManager, tests all created |
 | 2. Core Tracker | COMPLETE | UsageTracker, ManualDetector, tests |
-| 3. Status Bar UI & Extension Wiring | NOT STARTED | StatusBar, extension.ts rewrite, package.json |
-| 4. Log File Detector | NOT STARTED | LogFileDetector, wiring |
+| 3. Status Bar UI & Extension Wiring | COMPLETE | StatusBar, extension.ts rewrite, package.json |
+| 4. Log File Detector | COMPLETE | LogFileDetector, wiring |
 | 5. Dashboard Webview | NOT STARTED | Message protocol, DashboardPanel, wiring |
 | 6. Polish & Packaging | NOT STARTED | CompletionDetector, esbuild, integration tests |
 | 7. GitHub Open Source Setup | NOT STARTED | Community docs, issue templates, repo settings |
@@ -111,7 +111,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 
 ---
 
-## Milestone 3: TODO — Status Bar UI & Extension Wiring
+## Milestone 3: COMPLETE — Status Bar UI & Extension Wiring
 
 ### Task 3.1: Implement Status Bar Component
 **File**: `src/presentation/components/status-bar/status-bar.component.ts`
@@ -160,7 +160,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 
 ---
 
-## Milestone 4: TODO — Log File Detector
+## Milestone 4: COMPLETE — Log File Detector
 
 ### Task 4.1: Discovery
 - This is exploratory — need to find where Antigravity IDE extension writes logs

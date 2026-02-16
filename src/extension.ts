@@ -1,26 +1,50 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { StorageManager } from './infrastructure/storage/storage-manager.js';
+import { UsageTracker } from './core/services/usage-tracker.service.js';
+import { ManualDetector } from './infrastructure/detection/manual-detector.js';
+import { LogFileDetector } from './infrastructure/detection/log-file-detector.js';
+import { StatusBarComponent } from './presentation/components/status-bar/status-bar.component.js';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    const storageManager = new StorageManager(context);
+    const usageTracker = new UsageTracker(storageManager);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "antigravity-model-usage" is now active!');
+    const manualDetector = new ManualDetector();
+    usageTracker.registerStrategy(manualDetector);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('antigravity-model-usage.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from antigravity-model-usage!');
-	});
+    const logFileDetector = new LogFileDetector();
+    usageTracker.registerStrategy(logFileDetector);
 
-	context.subscriptions.push(disposable);
+    const statusBar = new StatusBarComponent(usageTracker);
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('antigravity-model-usage.showDashboard', () => {
+            vscode.window.showInformationMessage('Antigravity Usage Dashboard coming soon.');
+        }),
+
+        vscode.commands.registerCommand('antigravity-model-usage.resetUsageData', async () => {
+            await storageManager.clearAllData();
+            vscode.window.showInformationMessage('Antigravity usage data has been reset.');
+        }),
+
+        vscode.commands.registerCommand('antigravity-model-usage.toggleTracking', async () => {
+            const settings = storageManager.loadSettings();
+            settings.trackingEnabled = !settings.trackingEnabled;
+            await storageManager.saveSettings(settings);
+            vscode.window.showInformationMessage(
+                `Antigravity tracking ${settings.trackingEnabled ? 'enabled' : 'disabled'}.`,
+            );
+        }),
+
+        vscode.commands.registerCommand('antigravity-model-usage.logManualUsage', () => {
+            manualDetector.logEvent();
+            vscode.window.showInformationMessage('Manual usage event logged.');
+        }),
+
+        statusBar,
+        usageTracker,
+        storageManager,
+    );
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
