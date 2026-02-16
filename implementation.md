@@ -21,7 +21,7 @@
 
 ### Files Created
 
-#### `src/types.ts`
+#### `src/core/entities/types.ts`
 All TypeScript interfaces and types defined:
 - `DetectionSource` — union type: `'output-channel' | 'log-file' | 'completion-event' | 'inline-chat' | 'manual'`
 - `UsageType` — union type: `'completion' | 'chat' | 'inline-edit' | 'unknown'`
@@ -35,7 +35,7 @@ All TypeScript interfaces and types defined:
 - `UsageSummary` — computed rolling summary for display
 - `DetectionStrategy` — interface for pluggable detectors (source, onDetected event, start(), dispose())
 
-#### `src/storageManager.ts`
+#### `src/infrastructure/storage/storage-manager.ts`
 `StorageManager` class with:
 - Constructor takes `vscode.ExtensionContext`, extracts `workspaceState` and `globalState`
 - `loadUsageData()` — reads from workspaceState with caching, returns defaults if empty
@@ -50,7 +50,7 @@ All TypeScript interfaces and types defined:
 - Storage keys: `antigravity.usageData` (workspace), `antigravity.settings` (global)
 - Schema version constant: `SCHEMA_VERSION = 1`
 
-#### `src/test/storageManager.test.ts`
+#### `src/test/unit/infrastructure/storage-manager.test.ts`
 Tests using MockMemento (in-memory vscode.Memento implementation):
 - Loading empty state returns valid defaults
 - appendEvent persists data correctly
@@ -72,7 +72,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 ## Milestone 2: TODO — Core Tracker
 
 ### Task 2.1: Implement UsageTracker
-**File**: `src/usageTracker.ts`
+**File**: `src/core/services/usage-tracker.service.ts`
 - Create `UsageTracker` class implementing `vscode.Disposable`
 - Accept `StorageManager` as constructor dependency
 - Maintain in-memory rolling windows: last 60s (per-min), last 60min (per-hour), current day
@@ -89,7 +89,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 - **Settings access**: Get thresholds from `StorageManager.loadSettings()` for rateLimitStatus computation
 
 ### Task 2.2: Implement Manual Detection Strategy
-**File**: `src/detection/manualDetector.ts`
+**File**: `src/infrastructure/detection/manual-detector.ts`
 - Create `ManualDetector` class implementing `DetectionStrategy`
 - Has `source: 'manual'`
 - Uses `vscode.EventEmitter<DetectedEvent>` internally
@@ -98,7 +98,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 - `dispose()` disposes the event emitter
 
 ### Task 2.3: Write UsageTracker Tests
-**File**: `src/test/usageTracker.test.ts`
+**File**: `src/test/unit/core/usage-tracker.test.ts`
 - Test: processing a DetectedEvent produces correct UsageEvent
 - Test: rolling window correctly counts events in last 60 seconds
 - Test: rolling window correctly counts events in last 60 minutes
@@ -114,7 +114,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 ## Milestone 3: TODO — Status Bar UI & Extension Wiring
 
 ### Task 3.1: Implement Status Bar Component
-**File**: `src/ui/statusBar.ts`
+**File**: `src/presentation/components/status-bar/status-bar.component.ts`
 - Create `StatusBarComponent` class implementing `vscode.Disposable`
 - Accept `UsageTracker` as constructor dependency
 - Create `StatusBarItem` with `vscode.StatusBarAlignment.Right`, priority 100
@@ -168,7 +168,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 - Document findings in code comments
 
 ### Task 4.2: Implement Log File Detector
-**File**: `src/detection/logFileDetector.ts`
+**File**: `src/infrastructure/detection/log-file-detector.ts`
 - Create `LogFileDetector` class implementing `DetectionStrategy`
 - `source: 'log-file'`
 - Log path discovery: check known locations, support configurable override via settings
@@ -190,7 +190,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 ## Milestone 5: TODO — Dashboard Webview
 
 ### Task 5.1: Define Webview Message Protocol
-**File**: `src/ui/types.ts`
+**File**: `src/presentation/components/dashboard/types.ts`
 - `ExtensionToWebviewMessage` union:
   - `{ type: 'update', data: UsageSummary & { events: UsageEvent[], dailySummaries: DailySummary[], lastKnownRateLimit?: RateLimitSnapshot } }`
   - `{ type: 'settings', data: GlobalSettings }`
@@ -200,7 +200,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
   - `{ type: 'requestRefresh' }`
 
 ### Task 5.2: Implement Dashboard Panel
-**File**: `src/ui/dashboardPanel.ts`
+**File**: `src/presentation/components/dashboard/dashboard.component.ts`
 - `DashboardPanel` class implementing `vscode.Disposable`
 - Dependencies: `UsageTracker`, `StorageManager`
 - `show()` — creates or reveals WebviewPanel (`viewType: 'antigravityDashboard'`)
@@ -226,7 +226,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 ## Milestone 6: TODO — Polish & Packaging
 
 ### Task 6.1: Completion Event Detector
-**File**: `src/detection/completionDetector.ts`
+**File**: `src/infrastructure/detection/completion-detector.ts`
 - Monitor `vscode.workspace.onDidChangeTextDocument` events
 - Detect AI-characteristic insertions:
   - Large multi-line inserts (>5 lines in one change)
@@ -254,6 +254,63 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 
 ---
 
+## Project Structure (CLEAN Architecture)
+
+```
+src/
+├── core/                          # Domain layer - Pure business logic (no external dependencies)
+│   ├── entities/                  # Core types and interfaces
+│   │   └── types.ts               # All domain entities and value objects
+│   ├── interfaces/                # Contracts for repositories and services
+│   │   ├── storage.interface.ts   # Storage repository contract
+│   │   └── detection-strategy.interface.ts
+│   └── services/                  # Domain services (business logic)
+│       └── usage-tracker.service.ts
+│
+├── infrastructure/                # Infrastructure layer - External concerns
+│   ├── storage/                   # Persistence implementations
+│   │   └── storage-manager.ts     # VSCode state storage implementation
+│   └── detection/                 # Detection strategy implementations
+│       ├── manual-detector.ts
+│       ├── log-file-detector.ts
+│       └── completion-detector.ts
+│
+├── presentation/                  # Presentation layer - UI and user interaction
+│   ├── controllers/               # Controllers - Handle user input and call use cases
+│   │   └── command.controller.ts  # VSCode command handlers
+│   └── components/                # Presenters/View components
+│       ├── status-bar/
+│       │   └── status-bar.component.ts
+│       └── dashboard/
+│           └── dashboard.component.ts
+│
+├── test/                          # Tests mirroring the structure
+│   ├── unit/
+│   │   ├── core/
+│   │   └── infrastructure/
+│   ├── integration/
+│   └── helpers/
+│       └── mock-memento.ts
+│
+└── extension.ts                   # Composition root - Dependency injection and wiring
+```
+
+**Architecture Principles**:
+- **Core (Domain)**: Contains pure business logic with no dependencies on VSCode API or external frameworks
+  - Entities: Core data types (UsageEvent, RateLimitSnapshot, etc.)
+  - Interfaces: Contracts for repositories and external services
+  - Services: Business logic for tracking and aggregation
+- **Infrastructure**: Implements interfaces defined in Core, handles external concerns
+  - Storage: VSCode Memento persistence
+  - Detection: Log file readers, completion monitors
+- **Presentation (Interface Adapters)**: UI and user interaction
+  - Controllers: Handle VSCode commands, call use cases
+  - Components: Status bar, dashboard webviews (presenters)
+- **Dependency Rule**: Dependencies point inward (Presentation → Core ← Infrastructure)
+- **Extension.ts**: Composition root where all dependencies are wired together
+
+---
+
 ## Architecture Notes
 
 ### Data Flow
@@ -275,6 +332,24 @@ DetectionStrategy (log file, completion, manual)
 3. **Pluggable detection**: `DetectionStrategy` interface allows adding new detection methods
 4. **VSCode config precedence**: `loadSettings()` lets VSCode workspace config override stored settings
 5. **Event deduplication**: 500ms window prevents duplicate counting from multiple detection sources
+
+### Import Path Examples (CLEAN Architecture)
+- Domain entities: `import { UsageEvent } from '../../core/entities/types.js';`
+- Storage interface: `import { IStorageRepository } from '../../core/interfaces/storage.interface.js';`
+- Storage implementation: `import { StorageManager } from '../../infrastructure/storage/storage-manager.js';`
+- Detection strategy: `import { ManualDetector } from '../../infrastructure/detection/manual-detector.js';`
+- Components: `import { StatusBarComponent } from '../../presentation/components/status-bar/status-bar.component.js';`
+
+### Core Interfaces to Create
+Before Milestone 2, create these interface files:
+
+**File**: `src/core/interfaces/storage.interface.ts`
+- `IStorageRepository` interface with methods: `loadUsageData()`, `saveUsageData()`, `appendEvent()`, `pruneOldData()`, `clearAllData()`
+- `ISettingsRepository` interface with methods: `loadSettings()`, `saveSettings()`
+
+**File**: `src/core/interfaces/detection-strategy.interface.ts`
+- Move `DetectionStrategy` interface from types.ts to this file
+- This interface is the port for all detection implementations
 
 ### Existing Project State
 - **package.json**: Currently has hello-world command, needs full replacement in Milestone 3

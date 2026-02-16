@@ -6,19 +6,29 @@ This VSCode extension tracks Google Antigravity IDE model usage and rate limits,
 
 **Core Value Proposition**: Give developers real-time insights into their Antigravity IDE usage to prevent hitting rate limits and optimize their AI-assisted development workflow.
 
-## Project Structure
+## Project Structure (CLEAN Architecture)
 
 ```
-.
-├── src/
-│   ├── extension.ts          # Main extension entry point
-│   ├── usageTracker.ts        # Core tracking logic
-│   ├── storageManager.ts      # Persistent storage handling
-│   └── ui/                    # UI components (status bar, webviews)
-├── package.json               # Extension manifest and dependencies
-├── tsconfig.json              # TypeScript configuration
-└── .vscode/                   # VSCode workspace settings
+src/
+├── core/                    # Domain - Pure business logic (no VSCode deps)
+│   ├── entities/           # Types and interfaces
+│   ├── interfaces/         # Repository contracts
+│   └── services/           # Business logic
+├── infrastructure/         # External implementations (VSCode, file system)
+│   ├── storage/           # VSCode Memento persistence
+│   └── detection/         # Log parsers, monitors
+├── presentation/          # UI and controllers
+│   ├── controllers/       # Command handlers
+│   └── components/        # Status bar, dashboard
+├── test/
+│   ├── unit/
+│   ├── integration/
+│   └── helpers/
+└── extension.ts           # Composition root (DI)
 ```
+
+**Dependency Rule**: `Presentation → Core ← Infrastructure` (dependencies point inward)
+**Core Rule**: No `vscode` imports in `core/` - keep it framework-agnostic
 
 ## Technology Stack
 
@@ -90,6 +100,13 @@ For detailed implementation guidance, see:
 
 ## Code Conventions
 
-The codebase follows existing VSCode extension patterns. Use the TypeScript compiler and ESLint to catch issues early - they're configured in the project.
+- **CLEAN Architecture**: Core (no VSCode deps) → Infrastructure/Presentation
+- **Imports**: Use `.js` extensions (Node16 module resolution requirement)
+- **Naming**: `*.service.ts`, `*.component.ts`, `*.controller.ts`, `*-detector.ts`, `*.interface.ts`
+- **New Code**:
+  - Domain types → `core/entities/types.ts`
+  - Business logic → `core/services/`
+  - VSCode implementations → `infrastructure/` or `presentation/`
+  - Tests → `test/unit/` or `test/integration/`
 
-When in doubt, reference similar features in the codebase or check existing VSCode extension examples.
+Follow TypeScript/ESLint config. See `implementation.md` for detailed architecture notes.

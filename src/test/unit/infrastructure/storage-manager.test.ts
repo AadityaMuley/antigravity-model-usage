@@ -1,38 +1,7 @@
 import * as assert from 'assert';
-import * as vscode from 'vscode';
-import { StorageManager } from '../storageManager.js';
-import { UsageEvent, PersistedUsageData } from '../types.js';
-
-/** In-memory mock of vscode.Memento */
-class MockMemento implements vscode.Memento {
-    private store = new Map<string, unknown>();
-
-    keys(): readonly string[] {
-        return [...this.store.keys()];
-    }
-
-    get<T>(key: string): T | undefined;
-    get<T>(key: string, defaultValue: T): T;
-    get<T>(key: string, defaultValue?: T): T | undefined {
-        const val = this.store.get(key);
-        return val !== undefined ? val as T : defaultValue;
-    }
-
-    async update(key: string, value: unknown): Promise<void> {
-        if (value === undefined) {
-            this.store.delete(key);
-        } else {
-            this.store.set(key, value);
-        }
-    }
-}
-
-function makeMockContext(): vscode.ExtensionContext {
-    return {
-        workspaceState: new MockMemento(),
-        globalState: new MockMemento(),
-    } as unknown as vscode.ExtensionContext;
-}
+import { StorageManager } from '../../../infrastructure/storage/storage-manager.js';
+import { UsageEvent } from '../../../core/entities/types.js';
+import { makeMockContext } from '../../helpers/mock-memento.js';
 
 function makeEvent(overrides: Partial<UsageEvent> = {}): UsageEvent {
     return {

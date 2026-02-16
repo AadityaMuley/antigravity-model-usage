@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { PersistedUsageData, GlobalSettings, UsageEvent, DailySummary, UsageType } from './types.js';
+import { PersistedUsageData, GlobalSettings, UsageEvent, DailySummary, UsageType } from '../../core/entities/types.js';
 
 const USAGE_DATA_KEY = 'antigravity.usageData';
 const SETTINGS_KEY = 'antigravity.settings';
