@@ -5,7 +5,7 @@
 | Milestone | Status | Notes |
 |-----------|--------|-------|
 | 1. Foundation — Types & Storage | COMPLETE | Types, StorageManager, tests all created |
-| 2. Core Tracker | NOT STARTED | UsageTracker, ManualDetector, tests |
+| 2. Core Tracker | COMPLETE | UsageTracker, ManualDetector, tests |
 | 3. Status Bar UI & Extension Wiring | NOT STARTED | StatusBar, extension.ts rewrite, package.json |
 | 4. Log File Detector | NOT STARTED | LogFileDetector, wiring |
 | 5. Dashboard Webview | NOT STARTED | Message protocol, DashboardPanel, wiring |
@@ -69,7 +69,7 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 
 ---
 
-## Milestone 2: TODO — Core Tracker
+## Milestone 2: COMPLETE — Core Tracker
 
 ### Task 2.1: Implement UsageTracker
 **File**: `src/core/services/usage-tracker.service.ts`
