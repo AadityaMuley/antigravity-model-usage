@@ -8,7 +8,7 @@
 | 2. Core Tracker | COMPLETE | UsageTracker, ManualDetector, tests |
 | 3. Status Bar UI & Extension Wiring | COMPLETE | StatusBar, extension.ts rewrite, package.json |
 | 4. Log File Detector | COMPLETE | LogFileDetector, wiring |
-| 5. Dashboard Webview | NOT STARTED | Message protocol, DashboardPanel, wiring |
+| 5. Dashboard Webview | COMPLETE | Message protocol, DashboardPanel, wiring |
 | 6. Polish & Packaging | NOT STARTED | CompletionDetector, esbuild, integration tests |
 | 7. GitHub Open Source Setup | NOT STARTED | Community docs, issue templates, repo settings |
 | 8. CI/CD & Versioning | NOT STARTED | GitHub Actions, CHANGELOG, semantic versioning |
@@ -187,39 +187,55 @@ Tests using MockMemento (in-memory vscode.Memento implementation):
 
 ---
 
-## Milestone 5: TODO — Dashboard Webview
+## Milestone 5: COMPLETE — Dashboard Webview
 
-### Task 5.1: Define Webview Message Protocol
-**File**: `src/presentation/components/dashboard/types.ts`
-- `ExtensionToWebviewMessage` union:
-  - `{ type: 'update', data: UsageSummary & { events: UsageEvent[], dailySummaries: DailySummary[], lastKnownRateLimit?: RateLimitSnapshot } }`
-  - `{ type: 'settings', data: GlobalSettings }`
-- `WebviewToExtensionMessage` union:
-  - `{ type: 'updateSettings', data: Partial<GlobalSettings> }`
-  - `{ type: 'resetData' }`
-  - `{ type: 'requestRefresh' }`
+### Files Created
 
-### Task 5.2: Implement Dashboard Panel
-**File**: `src/presentation/components/dashboard/dashboard.component.ts`
-- `DashboardPanel` class implementing `vscode.Disposable`
-- Dependencies: `UsageTracker`, `StorageManager`
-- `show()` — creates or reveals WebviewPanel (`viewType: 'antigravityDashboard'`)
-- HTML content generated with:
-  - Live stats cards (per-min, per-hour, per-day)
-  - Rate limit gauge (color-coded progress bar)
-  - Hourly breakdown bar chart (last 24h, inline SVG)
-  - Daily trend sparkline (last 7 days)
-  - Recent events table (last 50 events)
-  - Settings form (thresholds, limits)
-- `postMessage()` to send updates
-- Handle `onDidReceiveMessage` for settings/reset
-- Subscribe to `UsageTracker.onUsageUpdated` for live updates
-- CSP-compliant (no external resources, inline styles only)
-- Handle panel disposal and re-creation (singleton pattern with `currentPanel` static)
+#### `src/presentation/components/dashboard/types.ts`
+Message protocol types for extension↔webview communication:
+- `DashboardData` — extends `UsageSummary` with `events`, `dailySummaries`, `lastKnownRateLimit`
+- `ExtensionToWebviewMessage` — union: `{ type: 'update', data: DashboardData }` | `{ type: 'settings', data: GlobalSettings }`
+- `WebviewToExtensionMessage` — union: `{ type: 'updateSettings', data: Partial<GlobalSettings> }` | `{ type: 'resetData' }` | `{ type: 'requestRefresh' }`
 
-### Task 5.3: Wire Dashboard into Extension
-- Connect `showDashboard` command to `DashboardPanel.show()`
-- Pass initial data on panel creation
+#### `src/presentation/components/dashboard/dashboard.component.ts`
+`DashboardPanel` class implementing `vscode.Disposable`:
+- **Singleton pattern**: static `currentPanel`, static `show()` creates or reveals panel
+- **Dependencies**: `UsageTracker`, `StorageManager`, `vscode.ExtensionUri`
+- Creates `vscode.window.createWebviewPanel('antigravityDashboard', 'Antigravity Usage', ViewColumn.One, { enableScripts: true })`
+- **Live updates**: subscribes to `usageTracker.onUsageUpdated` → posts `'update'` message to webview
+- **Message handling** (`onDidReceiveMessage`):
+  - `'requestRefresh'` → sends full update + settings
+  - `'resetData'` → calls `storageManager.clearAllData()`, sends fresh update
+  - `'updateSettings'` → merges partial settings, saves, sends confirmation
+- **Panel disposal**: cleans up subscriptions, sets `currentPanel = undefined`
+- **HTML generation** (`getHtmlContent`):
+  - CSP: `default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-...'`
+  - All styles inline using VSCode CSS variables for theme compatibility
+  - **Stats cards row**: Per-minute, Per-hour, Today, Session counts
+  - **Rate limit gauge**: Color-coded progress bar (green/yellow/red based on `rateLimitStatus`)
+  - **Hourly breakdown**: Inline SVG bar chart showing last 24 hours of activity
+  - **Daily trend**: Inline SVG sparkline for last 7 days from `dailySummaries`
+  - **Recent events table**: Last 50 events with time, model, source, type columns
+  - **Settings section**: Editable daily limit, per-minute limit, warning/critical thresholds with Save button
+  - **Action buttons**: Save Settings, Reset All Data, Refresh
+- **Webview JavaScript** (inline, nonce-protected):
+  - Listens for `message` events, dispatches to `renderUpdate()` and `renderSettings()`
+  - `renderUpdate()`: updates stats cards, gauge, SVG charts, events table
+  - `renderHourlyChart()`: builds SVG bar chart with 24 buckets
+  - `renderDailyChart()`: builds SVG sparkline with 7-day data points
+  - `renderEvents()`: populates table with reversed (most recent first) events
+  - `escapeHtml()`: XSS prevention for model names
+  - Posts messages back for settings changes, reset, refresh
+- Helper: `getNonce()` generates 32-char random string for CSP
+
+### Files Modified
+
+#### `src/extension.ts`
+- Added import for `DashboardPanel` from `presentation/components/dashboard/dashboard.component.js`
+- Replaced placeholder `showDashboard` command (`showInformationMessage`) with `DashboardPanel.show(usageTracker, storageManager, context.extensionUri)`
+
+### Verification
+- `npm run compile` — no TypeScript errors
 
 ---
 

@@ -4,6 +4,7 @@ import { UsageTracker } from './core/services/usage-tracker.service.js';
 import { ManualDetector } from './infrastructure/detection/manual-detector.js';
 import { LogFileDetector } from './infrastructure/detection/log-file-detector.js';
 import { StatusBarComponent } from './presentation/components/status-bar/status-bar.component.js';
+import { DashboardPanel } from './presentation/components/dashboard/dashboard.component.js';
 
 export function activate(context: vscode.ExtensionContext) {
     const storageManager = new StorageManager(context);
@@ -19,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('antigravity-model-usage.showDashboard', () => {
-            vscode.window.showInformationMessage('Antigravity Usage Dashboard coming soon.');
+            DashboardPanel.show(usageTracker, storageManager, context.extensionUri);
         }),
 
         vscode.commands.registerCommand('antigravity-model-usage.resetUsageData', async () => {
