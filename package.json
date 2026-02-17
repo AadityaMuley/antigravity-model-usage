@@ -1,13 +1,22 @@
 {
   "name": "antigravity-model-usage",
-  "displayName": "antigravity-model-usage",
-  "description": "Extension to track the model limits and usage for Google Anitgravity.",
+  "displayName": "Antigravity Model Usage Tracker",
+  "description": "Track Google Antigravity IDE model usage, rate limits, and API consumption with real-time monitoring and visual dashboards.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
+    "AI",
     "Other"
+  ],
+  "keywords": [
+    "google-antigravity",
+    "usage-tracking",
+    "rate-limiting",
+    "ai-assistant",
+    "model-usage",
+    "api-monitoring"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -59,21 +68,23 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run package",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "package": "node esbuild.js --production"
   },
   "devDependencies": {
-    "@types/vscode": "^1.109.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "typescript-eslint": "^8.54.0",
+    "@types/vscode": "^1.109.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.27.3",
     "eslint": "^9.39.2",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.54.0"
   }
 }

@@ -9,7 +9,7 @@
 | 3. Status Bar UI & Extension Wiring | COMPLETE | StatusBar, extension.ts rewrite, package.json |
 | 4. Log File Detector | COMPLETE | LogFileDetector, wiring |
 | 5. Dashboard Webview | COMPLETE | Message protocol, DashboardPanel, wiring |
-| 6. Polish & Packaging | NOT STARTED | CompletionDetector, esbuild, integration tests |
+| 6. Polish & Packaging | COMPLETE | CompletionDetector, esbuild, integration tests, README, metadata |
 | 7. GitHub Open Source Setup | NOT STARTED | Community docs, issue templates, repo settings |
 | 8. CI/CD & Versioning | NOT STARTED | GitHub Actions, CHANGELOG, semantic versioning |
 | 9. VS Code & Antigravity Marketplace Publishing | NOT STARTED | Publisher accounts, .vscodeignore, first publish |
@@ -239,34 +239,63 @@ Message protocol types for extension↔webview communication:
 
 ---
 
-## Milestone 6: TODO — Polish & Packaging
+## Milestone 6: COMPLETE — Polish & Packaging
 
-### Task 6.1: Completion Event Detector
-**File**: `src/infrastructure/detection/completion-detector.ts`
-- Monitor `vscode.workspace.onDidChangeTextDocument` events
-- Detect AI-characteristic insertions:
-  - Large multi-line inserts (>5 lines in one change)
-  - Rapid text appearance patterns
-- Correlate with timing to distinguish from paste/regular typing
-- Emit `DetectedEvent` with source `'completion-event'`
+### Files Created
 
-### Task 6.2: Extension Metadata
-- Add extension icon (128x128 PNG) — may need to create or source
-- Update `package.json`: displayName, description, categories, keywords
-- Update `README.md` with feature list, usage instructions
+#### `src/infrastructure/detection/completion-detector.ts`
+`CompletionDetector` class implementing `DetectionStrategy`:
+- `source: 'completion-event'`
+- Monitors `vscode.workspace.onDidChangeTextDocument` for AI-characteristic insertions
+- Detects multi-line inserts (>=5 lines) — typical of AI code completions
+- Filters non-file schemes (output channels, git, settings)
+- 2-second cooldown to avoid rapid-fire emission from chunked inserts
+- Estimates tokens at ~4 chars per token
+- `start()` subscribes to document change events
+- `dispose()` cleans up listener and emitter
 
-### Task 6.3: Build & Bundle
-- Add `esbuild` to devDependencies
-- Create `esbuild.js` config for production bundling
-- Update `vscode:prepublish` script to use esbuild
-- Verify `vsce package` produces working `.vsix`
+#### `esbuild.js`
+Production bundling configuration:
+- Entry: `src/extension.ts` → `out/extension.js`
+- Externals: `vscode`
+- Format: `cjs`, platform: `node`, target: `ES2022`
+- Production mode: minified, no sourcemaps
+- Dev mode: sourcemaps included
 
-### Task 6.4: Integration Tests
-**File**: `src/test/integration/extension.test.ts`
-- Extension activates without errors
-- Status bar item created on activation
-- Manual usage command registers an event
-- Dashboard panel opens via command
+### Files Modified
+
+#### `package.json`
+- `displayName`: "Antigravity Model Usage Tracker"
+- `description`: Updated with detailed feature description
+- `categories`: Added "AI"
+- `keywords`: Added google-antigravity, usage-tracking, rate-limiting, ai-assistant, model-usage, api-monitoring
+- `scripts.vscode:prepublish`: Changed from `npm run compile` to `npm run package`
+- `scripts.package`: Added `node esbuild.js --production`
+- `devDependencies`: Added `esbuild`
+
+#### `README.md`
+Replaced template content with full documentation:
+- Features list (status bar, dashboard, detection strategies, configuration, persistence)
+- Installation instructions (from source, from VSIX)
+- Usage: commands table, status bar behavior, dashboard sections
+- Configuration: all `antigravity.*` settings with defaults
+- Development commands
+- Architecture overview (CLEAN architecture)
+
+#### `src/extension.ts`
+- Added import for `CompletionDetector`
+- Instantiate and register `CompletionDetector` with `UsageTracker`
+
+#### `src/test/integration/extension.test.ts`
+Replaced placeholder test with real integration tests:
+- Extension is present and activates
+- All 4 commands are registered (showDashboard, logManualUsage, resetUsageData, toggleTracking)
+- logManualUsage command executes without error
+
+### Verification
+- `npm run compile` — no TypeScript errors
+- `npm run lint` — no lint errors
+- `npm run package` — esbuild production bundle succeeds
 
 ---
 

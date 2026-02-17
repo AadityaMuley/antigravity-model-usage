@@ -3,6 +3,7 @@ import { StorageManager } from './infrastructure/storage/storage-manager.js';
 import { UsageTracker } from './core/services/usage-tracker.service.js';
 import { ManualDetector } from './infrastructure/detection/manual-detector.js';
 import { LogFileDetector } from './infrastructure/detection/log-file-detector.js';
+import { CompletionDetector } from './infrastructure/detection/completion-detector.js';
 import { StatusBarComponent } from './presentation/components/status-bar/status-bar.component.js';
 import { DashboardPanel } from './presentation/components/dashboard/dashboard.component.js';
 
@@ -15,6 +16,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     const logFileDetector = new LogFileDetector();
     usageTracker.registerStrategy(logFileDetector);
+
+    const completionDetector = new CompletionDetector();
+    usageTracker.registerStrategy(completionDetector);
 
     const statusBar = new StatusBarComponent(usageTracker);
 

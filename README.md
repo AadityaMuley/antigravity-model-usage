@@ -1,71 +1,98 @@
-# antigravity-model-usage
+# Antigravity Model Usage Tracker
 
-This is the README for your extension "antigravity-model-usage". After writing up a brief description, we recommend including the following sections.
+A VS Code extension that tracks Google Antigravity IDE model usage and rate limits, giving developers real-time visibility into their API consumption.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Real-time status bar** — See per-minute and daily usage counts at a glance, with color-coded warnings when approaching rate limits
+- **Interactive dashboard** — Full webview panel with stats cards, rate limit gauge, hourly/daily charts, and a recent events table
+- **Pluggable detection** — Multiple detection strategies working together:
+  - **Log file monitoring** — Tails Antigravity IDE log files for API call patterns
+  - **Completion detection** — Identifies AI-generated code insertions via document change analysis
+  - **Manual logging** — Log events manually when automatic detection isn't available
+- **Configurable thresholds** — Set your own daily/per-minute limits and warning/critical percentages
+- **Persistent storage** — Usage data persists across sessions with automatic pruning of old events
 
-For example if there is an image subfolder under your extension project workspace:
+## Installation
 
-\!\[feature X\]\(images/feature-x.png\)
+### From Source
+```bash
+git clone https://github.com/<username>/antigravity-model-usage.git
+cd antigravity-model-usage
+npm install
+```
+Press **F5** in VS Code to launch the Extension Development Host.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### From VSIX
+1. Download the `.vsix` file from [Releases](https://github.com/<username>/antigravity-model-usage/releases)
+2. In VS Code: Command Palette → **Install from VSIX...**
 
-## Requirements
+## Usage
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Commands
 
-## Extension Settings
+Open the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and search for:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+| Command | Description |
+|---------|-------------|
+| **Antigravity: Show Usage Dashboard** | Open the interactive dashboard webview |
+| **Antigravity: Log Manual Usage** | Record a manual usage event |
+| **Antigravity: Reset Usage Data** | Clear all tracked usage data |
+| **Antigravity: Toggle Usage Tracking** | Enable or disable usage tracking |
 
-For example:
+### Status Bar
 
-This extension contributes the following settings:
+The status bar item (right side) shows `AG: X/min | Y today`. Click it to open the dashboard.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- **Default background** — usage is within normal range
+- **Yellow background** — usage exceeds the warning threshold
+- **Red background** — usage exceeds the critical threshold
 
-## Known Issues
+### Dashboard
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+The dashboard displays:
+- **Stats cards** — per-minute, per-hour, today, and session counts
+- **Rate limit gauge** — color-coded progress bar showing daily limit usage
+- **Hourly chart** — bar chart of requests over the last 24 hours
+- **Daily trend** — sparkline of the last 7 days
+- **Recent events** — table of the last 50 detected events
+- **Settings** — edit thresholds and limits directly from the dashboard
 
-## Release Notes
+## Configuration
 
-Users appreciate release notes as you update your extension.
+All settings are available under `antigravity.*` in VS Code Settings:
 
-### 1.0.0
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `antigravity.estimatedDailyLimit` | `1500` | Estimated daily request limit for your plan |
+| `antigravity.estimatedPerMinuteLimit` | `30` | Estimated per-minute request limit |
+| `antigravity.warningThresholdPercent` | `70` | Percentage of daily limit to trigger a warning |
+| `antigravity.criticalThresholdPercent` | `90` | Percentage of daily limit to trigger a critical alert |
 
-Initial release of ...
+## Development
 
-### 1.0.1
+```bash
+npm install          # Install dependencies
+npm run compile      # Compile TypeScript
+npm run watch        # Watch mode
+npm run lint         # Run ESLint
+npm test             # Run tests
+npm run package      # Bundle with esbuild and package VSIX
+```
 
-Fixed issue #.
+## Architecture
 
-### 1.1.0
+This extension follows **CLEAN Architecture** with dependencies pointing inward:
 
-Added features X, Y, and Z.
+```
+Presentation → Core ← Infrastructure
+```
 
----
+- **Core** (`src/core/`) — Domain types and business logic (no VS Code dependencies)
+- **Infrastructure** (`src/infrastructure/`) — Storage and detection implementations
+- **Presentation** (`src/presentation/`) — Status bar, dashboard, and command handlers
+- **Composition root** (`src/extension.ts`) — Dependency wiring
 
-## Following extension guidelines
+## License
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+[Apache 2.0](LICENSE)
