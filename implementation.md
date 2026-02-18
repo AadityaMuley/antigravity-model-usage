@@ -10,7 +10,7 @@
 | 4. Log File Detector | COMPLETE | LogFileDetector, wiring |
 | 5. Dashboard Webview | COMPLETE | Message protocol, DashboardPanel, wiring |
 | 6. Polish & Packaging | COMPLETE | CompletionDetector, esbuild, integration tests, README, metadata |
-| 7. GitHub Open Source Setup | NOT STARTED | Community docs, issue templates, repo settings |
+| 7. GitHub Open Source Setup | COMPLETE | Community docs, issue templates, repo settings |
 | 8. CI/CD & Versioning | NOT STARTED | GitHub Actions, CHANGELOG, semantic versioning |
 | 9. VS Code & Antigravity Marketplace Publishing | NOT STARTED | Publisher accounts, .vscodeignore, first publish |
 | 10. Documentation & Release Readiness | NOT STARTED | Screenshots, badges, .vscode config, 1.0.0 checklist |
@@ -406,7 +406,7 @@ Before Milestone 2, create these interface files:
 
 ---
 
-## Milestone 7: TODO — GitHub Open Source Project Setup
+## Milestone 7: COMPLETE — GitHub Open Source Project Setup
 
 Establishes the project as a professional open source repository with community guidelines, contributor documentation, and GitHub configuration.
 

@@ -1,5 +1,8 @@
 # Antigravity Model Usage Tracker
 
+[![License](https://img.shields.io/github/license/AadityaMuley/antigravity-model-usage)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 A VS Code extension that tracks Google Antigravity IDE model usage and rate limits, giving developers real-time visibility into their API consumption.
 
 ## Features
@@ -13,19 +16,31 @@ A VS Code extension that tracks Google Antigravity IDE model usage and rate limi
 - **Configurable thresholds** — Set your own daily/per-minute limits and warning/critical percentages
 - **Persistent storage** — Usage data persists across sessions with automatic pruning of old events
 
+<!-- Screenshots: uncomment when images are added
+![Status Bar](images/status-bar.png)
+![Dashboard](images/dashboard-overview.png)
+-->
+
 ## Installation
 
+### From VS Code Marketplace
+
+Search for **Antigravity Model Usage Tracker** in the Extensions panel.
+
+### From VSIX
+
+1. Download the `.vsix` file from [Releases](https://github.com/AadityaMuley/antigravity-model-usage/releases)
+2. In VS Code: Command Palette → **Install from VSIX...**
+
 ### From Source
+
 ```bash
-git clone https://github.com/<username>/antigravity-model-usage.git
+git clone https://github.com/AadityaMuley/antigravity-model-usage.git
 cd antigravity-model-usage
 npm install
 ```
-Press **F5** in VS Code to launch the Extension Development Host.
 
-### From VSIX
-1. Download the `.vsix` file from [Releases](https://github.com/<username>/antigravity-model-usage/releases)
-2. In VS Code: Command Palette → **Install from VSIX...**
+Press **F5** in VS Code to launch the Extension Development Host.
 
 ## Usage
 
@@ -92,6 +107,10 @@ Presentation → Core ← Infrastructure
 - **Infrastructure** (`src/infrastructure/`) — Storage and detection implementations
 - **Presentation** (`src/presentation/`) — Status bar, dashboard, and command handlers
 - **Composition root** (`src/extension.ts`) — Dependency wiring
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and PR guidelines.
 
 ## License
 

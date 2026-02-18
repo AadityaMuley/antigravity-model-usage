@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/AadityaMuley/antigravity-model-usage#readme
+    about: Read the project documentation
+  - name: Security Vulnerability
+    url: https://github.com/AadityaMuley/antigravity-model-usage/security/advisories/new
+    about: Report security vulnerabilities privately
