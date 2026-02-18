@@ -11,7 +11,7 @@
 | 5. Dashboard Webview | COMPLETE | Message protocol, DashboardPanel, wiring |
 | 6. Polish & Packaging | COMPLETE | CompletionDetector, esbuild, integration tests, README, metadata |
 | 7. GitHub Open Source Setup | COMPLETE | Community docs, issue templates, repo settings |
-| 8. CI/CD & Versioning | NOT STARTED | GitHub Actions, CHANGELOG, semantic versioning |
+| 8. CI/CD & Versioning | COMPLETE | GitHub Actions, CHANGELOG, semantic versioning |
 | 9. VS Code & Antigravity Marketplace Publishing | NOT STARTED | Publisher accounts, .vscodeignore, first publish |
 | 10. Documentation & Release Readiness | NOT STARTED | Screenshots, badges, .vscode config, 1.0.0 checklist |
 
@@ -485,7 +485,7 @@ Establishes the project as a professional open source repository with community 
 
 ---
 
-## Milestone 8: TODO — CI/CD & Versioning
+## Milestone 8: COMPLETE — CI/CD & Versioning
 
 Automated build, test, and release pipelines using GitHub Actions, plus semantic versioning and changelog management.
 

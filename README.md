@@ -95,6 +95,21 @@ npm test             # Run tests
 npm run package      # Bundle with esbuild and package VSIX
 ```
 
+### Running Locally for Debugging
+
+1. Open this project in VS Code or Antigravity IDE
+2. Run `npm install` if you haven't already
+3. Press `fn+F5` (Mac) or `F5` (Windows/Linux) to launch the **Extension Development Host**
+   - Alternatively: `Cmd+Shift+P` → **"Debug: Start Debugging"** → select **"Run Extension"**
+4. A new IDE window opens with the extension loaded — look for `AG: 0/min | 0 today` in the bottom-right status bar
+5. Test the extension:
+   - `Cmd+Shift+P` → **"Antigravity: Log Manual Usage"** — run a few times to generate events
+   - `Cmd+Shift+P` → **"Antigravity: Show Usage Dashboard"** — opens the dashboard webview
+   - Watch the status bar update in real time
+6. Stop debugging with `Shift+F5`
+
+> **Note**: Log file detection depends on finding Antigravity IDE log files on your system. Use the **Log Manual Usage** command to generate test events if no logs are detected automatically.
+
 ## Architecture
 
 This extension follows **CLEAN Architecture** with dependencies pointing inward:
